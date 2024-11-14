@@ -1,2 +1,2 @@
-# csharp-workflows
-A centralized project for CShard related workflows
+# workflows
+A centralized project for workflows
