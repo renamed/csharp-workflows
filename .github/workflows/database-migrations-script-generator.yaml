@@ -1,0 +1,71 @@
+name: Database Migration Script Generator
+
+on:
+  workflow_call:
+    inputs:
+      projectName:
+        description: 'The project where the migrations exist'
+        required: true
+        type: string
+      startupProjectName:
+        description: 'The name of the project that your project runs from'
+        required: true
+        type: string
+      contextClassName:
+        description: 'The name of the class that inherits from DbContext to be used to generate the migration script'
+        required: true
+        type: string
+      outputFilePath:
+        description: 'The directory where the migration script will be created'
+        required: true
+        type: string
+      outputFileName:
+        description: 'The name to be given to the migration script'
+        required: false
+        type: string
+        default: 'migrations.sql'      
+      netVersion:
+        description: 'The .NET version'
+        required: false
+        type: string
+        default: '8.0.x'
+
+jobs:
+  generate_sql_script:
+    runs-on: ubuntu-latest
+
+    steps:      
+      - name: Check out code
+        uses: actions/checkout@v3
+      
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ inputs.netVersion }}
+
+      - name: Installs dotnet-ef CLI
+        run: dotnet tool install --global dotnet-ef
+      
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Generate migration SQL script
+        run: |          
+          dotnet ef migrations script \
+            -i \
+            -o ${{ inputs.outputFileName }} \
+            -c ${{ inputs.contextClassName }} \
+            -p ${{ inputs.projectName }} \
+            -s ${{ inputs.startupProjectName }} 
+      
+      - name: Move file to destinarion
+        run: mv -f -v ${{ inputs.outputFileName }} ${{ inputs.outputFilePath }}
+
+      - name: Commits changes
+        run: |
+          git config --global user.name "github-actions[bot]"  # Nome de usuário do bot
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"  # E-mail do bot
+
+          git add ${{ inputs.outputFilePath }}/${{ inputs.outputFileName }} || echo "No changes to commit"
+          git commit -m 'Generated migration script'
+          git push
