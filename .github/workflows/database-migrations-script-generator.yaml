@@ -63,8 +63,8 @@ jobs:
 
       - name: Commits changes
         run: |
-          git config --global user.name "github-actions[bot]"  # Nome de usuário do bot
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"  # E-mail do bot
+          git config --global user.name ${{ vars.username }}
+          git config --global user.email ${{ vars.email }}
 
           git fetch origin
           git checkout ${{ github.head_ref }}
