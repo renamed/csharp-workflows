@@ -66,6 +66,7 @@ jobs:
           git config --global user.name "github-actions[bot]"  # Nome de usuário do bot
           git config --global user.email "github-actions[bot]@users.noreply.github.com"  # E-mail do bot
 
+          git fetch origin
           git checkout ${{ github.head_ref }}
 
           git add ${{ inputs.outputFilePath }}/${{ inputs.outputFileName }} || echo "No changes to commit"
