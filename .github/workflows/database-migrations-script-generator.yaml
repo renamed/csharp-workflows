@@ -36,7 +36,9 @@ jobs:
 
     steps:      
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
       
       - name: Set up .NET SDK
         uses: actions/setup-dotnet@v3
@@ -63,11 +65,8 @@ jobs:
 
       - name: Commits changes
         run: |
-          git config --global user.name ${{ vars.username }}
-          git config --global user.email ${{ vars.email }}
-
-          git fetch origin
-          git checkout ${{ github.head_ref }}
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add ${{ inputs.outputFilePath }}/${{ inputs.outputFileName }} || echo "No changes to commit"
           git commit -m 'Generated migration script'
