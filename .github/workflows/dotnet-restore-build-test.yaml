@@ -1,0 +1,40 @@
+name: .NET Restore Build Test
+
+on:
+  workflow_call:
+    inputs:
+      dotnet-version:
+        description: 'The .NET SDK version to use'
+        required: false
+        type: string
+        default: '8.0.x'
+      solution-file:
+        description: 'The solution file to build'
+        required: false
+        type: string
+        default: '**/*.sln'
+      build-configuration:
+        description: 'The build configuration to use'
+        required: false
+        type: string
+        default: 'Release'
+
+jobs:
+  restore-build-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ inputs.dotnet-version }}
+
+    - name: Restore dependencies
+      run: dotnet restore ${{ inputs.solution-file }}
+
+    - name: Build
+      run: dotnet build ${{ inputs.solution-file }} --configuration ${{ inputs.build-configuration }} --no-restore
+
+    - name: Test
+      run: dotnet test ${{ inputs.solution-file }} --configuration ${{ inputs.build-configuration }} --no-build --verbosity normal
