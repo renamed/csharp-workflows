@@ -37,4 +37,6 @@ jobs:
       run: dotnet build ${{ inputs.solution-file }} --configuration ${{ inputs.build-configuration }} --no-restore
 
     - name: Test
+      env:
+        ConnectionStrings__financas: ${{ secrets.INTEGRATION_TESTS_CONN_STR }}
       run: dotnet test ${{ inputs.solution-file }} --configuration ${{ inputs.build-configuration }} --no-build --verbosity normal
