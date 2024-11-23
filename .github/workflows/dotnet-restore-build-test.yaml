@@ -22,6 +22,10 @@ on:
 jobs:
   restore-build-test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-type: [UnitTest, IntegrationTest]
+
     steps:
     - uses: actions/checkout@v3
 
@@ -36,7 +40,7 @@ jobs:
     - name: Build
       run: dotnet build ${{ inputs.solution-file }} --configuration ${{ inputs.build-configuration }} --no-restore
 
-    - name: Test
+      - name: Run Tests
       env:
         ConnectionStrings__financas: ${{ secrets.INTEGRATION_TESTS_CONN_STR }}
-      run: dotnet test ${{ inputs.solution-file }} --configuration ${{ inputs.build-configuration }} --no-build --verbosity normal
+      run: dotnet test ${{ inputs.solution-file }} --filter Category=${{ matrix.test-type }} --configuration ${{ inputs.build-configuration }} --no-build --verbosity normal
