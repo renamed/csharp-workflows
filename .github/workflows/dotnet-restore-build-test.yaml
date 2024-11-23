@@ -38,3 +38,8 @@ jobs:
 
     - name: Unit Test
       run: dotnet test ${{ inputs.solution-file }} --filter Category=UnitTest --configuration ${{ inputs.build-configuration }} --no-build --verbosity normal
+
+    - name: Integration Test
+      env:
+        ConnectionStrings__financas: ${{ secrets.INTEGRATION_TESTS_CONN_STR }}
+      run: dotnet test ${{ inputs.solution-file }} --filter Category=IntegrationTest --configuration ${{ inputs.build-configuration }} --no-build --verbosity normal
